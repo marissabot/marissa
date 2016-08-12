@@ -10,7 +10,7 @@ object Main extends App {
   // connection details
 
   val details = new ConnectionDetails(
-    user = "user",
+    user = "marissabot",
     pass = "pass",
     nick = "nick",
     rooms = List("room")
