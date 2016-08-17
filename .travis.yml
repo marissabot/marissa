@@ -9,6 +9,6 @@ deploy:
   file: ./build/libs/marissa-capsule.jar
   skip_cleanup: true
   on:
-    repo: ninjabear/marissa-java
+    repo: marissabot/marissa
     tags: true
 

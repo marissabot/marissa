@@ -1,4 +1,4 @@
-# marissa-java [![Build Status](https://travis-ci.org/ninjabear/marissa-java.svg?branch=master)](https://travis-ci.org/ninjabear/marissa-java) [![GitHub](http://img.shields.io/github/release/ninjabear/marissa-java.svg)](https://github.com/ninjabear/marissa-java/releases) [![GitHub license](https://img.shields.io/github/license/ninjabear/marissa-java.svg)](/LICENCE)
+# marissa-java [![Build Status](https://travis-ci.org/marissabot/marissa.svg?branch=master)](https://travis-ci.org/marissabot/marissa) [![GitHub](http://img.shields.io/github/release/marissabot/marissa.svg)](https://github.com/marissabot/marissa/releases) [![GitHub license](https://img.shields.io/github/license/marissabot/marissa.svg)](/LICENCE)
 
 
 A Java8 hipchat bot
