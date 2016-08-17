@@ -7,6 +7,9 @@ mainClassName = 'org.marissa.Main'
 
 repositories {
     mavenCentral()
+    maven {
+        url  "https://dl.bintray.com/marissabot/maven"
+    }
 }
 
 configurations {
@@ -28,6 +31,7 @@ dependencies {
     compile 'rocks.xmpp:xmpp-debug:0.5.0'
 
     compile 'org.apache.httpcomponents:httpclient:4.4.1'
+    compile 'org.marissabot.libmarissa:libmarissa:0.1.0'
 
     compile 'co.paralleluniverse:quasar-core:0.7.2:jdk8'
     quasar 'co.paralleluniverse:quasar-core:0.7.2:jdk8'
