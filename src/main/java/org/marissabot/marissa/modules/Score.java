@@ -1,6 +1,7 @@
 package org.marissabot.marissa.modules;
 
 import org.marissabot.libmarissa.Response;
+import org.marissabot.libmarissa.model.Context;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
@@ -38,7 +39,7 @@ public class Score {
 
     private static Pattern syntax = Pattern.compile("([+-])(\\d+)(\\s+\\w+)?");
 
-    public static void scores(String trigger, Response response)
+    public static void scores(Context context, String trigger, Response response)
     {
         BigInteger total;
         synchronized (scoringLock)
@@ -60,7 +61,7 @@ public class Score {
     }
 
 
-    public static void scoreChange(String trigger, Response response)
+    public static void scoreChange(Context context, String trigger, Response response)
     {
         Matcher m = syntax.matcher(trigger);
         if (m.find())

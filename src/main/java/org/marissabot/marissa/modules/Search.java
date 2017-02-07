@@ -1,6 +1,7 @@
 package org.marissabot.marissa.modules;
 
 import org.marissabot.libmarissa.Response;
+import org.marissabot.libmarissa.model.Context;
 import org.marissabot.marissa.modules.bingsearch.BingSearch;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public class Search {
         }
     }
 
-    public static void search(String trigger, Response response){
+    public static void search(Context context, String trigger, Response response){
         Optional<SearchQuery> q = parseSearchQuery(trigger);
 
         if (q.isPresent())

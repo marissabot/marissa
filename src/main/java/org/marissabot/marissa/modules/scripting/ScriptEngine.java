@@ -8,6 +8,7 @@ import javax.script.Invocable;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import org.marissabot.libmarissa.Response;
+import org.marissabot.libmarissa.model.Context;
 
 public class ScriptEngine {
     
@@ -30,7 +31,7 @@ public class ScriptEngine {
         
     }
     
-    public static void dispatchToAll(String in, Response response) {
+    public static void dispatchToAll(Context context, String in, Response response) {
         
         try {
             invocable.invokeFunction("run", in.replaceFirst("mars", ""), response);

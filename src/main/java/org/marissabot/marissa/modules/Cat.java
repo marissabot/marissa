@@ -1,8 +1,10 @@
 package org.marissabot.marissa.modules;
 
+import co.paralleluniverse.fibers.SuspendExecution;
 import co.paralleluniverse.fibers.Suspendable;
 import org.marissabot.libmarissa.Response;
 import org.marissabot.libmarissa.RoutingEventListener;
+import org.marissabot.libmarissa.model.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +26,7 @@ public class Cat implements RoutingEventListener {
     Logger l = LoggerFactory.getLogger(Cat.class);
 
     @Override
-    @Suspendable
-    public void routingEvent(String trigger, Response response){
+    public void routingEvent(Context context, String trigger, Response response) throws InterruptedException, SuspendExecution {
         int cat = new Random(System.nanoTime()).nextInt(cats.length);
         response.send("meow #" +  (cat + 1) );
         response.send( cats[cat] );

@@ -24,14 +24,14 @@ public class Main {
         String nickname = Persist.load("core", "nickname");
         final String joinRoom = Persist.load("core", "joinroom");
 
-        Router router = new Router( "(?i)@?"+nickname );
+        Router router = new Router("(?i)@?"+nickname, true);
 
         router.on(".*time.*", MiscUtils::tellTheTime);
         router.on("selfie", MiscUtils::selfie);
         router.on("ping", MiscUtils::ping);
         router.on("echo.*", MiscUtils::echo);
 
-        router.on(".*", ScriptEngine::dispatchToAll);
+        //router.on(".*", ScriptEngine::dispatchToAll);
 
         router.on("define\\s+.*", Define::defineWord);
 
@@ -41,9 +41,9 @@ public class Main {
         router.on("[-+]\\d+", Score::scoreChange);
         router.on("score", Score::scores);
         router.whenContains("[-+]\\d+\\s+(?i)@?"+nickname,
-                            (trigger,response) -> {
+                            (c, trigger,response) -> {
                                 String noNick = trigger.replaceAll("(?i)@?"+nickname, "");
-                                Score.scoreChange(noNick, response);
+                                Score.scoreChange(c, noNick, response);
                             });
 
         Marissa marissa = new Marissa(

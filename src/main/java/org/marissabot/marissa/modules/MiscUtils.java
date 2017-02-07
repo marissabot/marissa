@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import org.marissabot.libmarissa.Response;
+import org.marissabot.libmarissa.model.Context;
 import org.slf4j.LoggerFactory;
 
 
@@ -11,12 +12,12 @@ public class MiscUtils {
     
     private MiscUtils() {}
     
-    public static void tellTheTime(String trigger, Response response)
+    public static void tellTheTime(Context context, String trigger, Response response)
     {
         response.send(LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEE dd MMM yyyy -- HH:mm.ss")));
     }
     
-    public static void selfie(String trigger, Response response)
+    public static void selfie(Context context, String trigger, Response response)
     {
         String[] selfies = {
             "http://aib.edu.au/blog/wp-content/uploads/2014/05/222977-marissa-mayer.jpg",
@@ -35,13 +36,13 @@ public class MiscUtils {
         response.send(selfies[selfieNo]);                
     }
     
-    public static void ping(String trigger, Response response)
+    public static void ping(Context context, String trigger, Response response)
     {
         response.send("pong");
     }
     
 
-    public static void echo(String trigger, Response response)
+    public static void echo(Context context, String trigger, Response response)
     {
         LoggerFactory.getLogger(MiscUtils.class).info("echoing '" + trigger + "'");
         response.send(trigger.replaceFirst("[^\\s]+\\s+echo\\s+", ""));

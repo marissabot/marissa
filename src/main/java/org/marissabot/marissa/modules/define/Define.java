@@ -2,6 +2,7 @@ package org.marissabot.marissa.modules.define;
 
 import co.paralleluniverse.fibers.Suspendable;
 import org.marissabot.libmarissa.Response;
+import org.marissabot.libmarissa.model.Context;
 import org.marissabot.marissa.modules.define.repo.Definition;
 import org.marissabot.marissa.modules.define.repo.DefinitionsRepo;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class Define {
     }
 
     @Suspendable
-    public static void defineWord(String trigger, Response response) {
+    public static void defineWord(Context context, String trigger, Response response) {
 
         String word = readTrigger(trigger);
 
