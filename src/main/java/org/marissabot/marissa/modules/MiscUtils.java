@@ -10,6 +10,7 @@ import java.util.TimeZone;
 
 import org.marissabot.libmarissa.Response;
 import org.marissabot.libmarissa.model.Context;
+import org.marissabot.marissa.modules.bingsearch.BingSearch;
 import org.slf4j.LoggerFactory;
 
 
@@ -28,21 +29,26 @@ public class MiscUtils {
     
     public static void selfie(Context context, String trigger, Response response)
     {
-        String[] selfies = {
-            "http://aib.edu.au/blog/wp-content/uploads/2014/05/222977-marissa-mayer.jpg",
-            "http://i.huffpost.com/gen/882663/images/o-MARISSA-MAYER-facebook.jpg",
-            "http://static.businessinsider.com/image/5213c32cecad045804000016/image.jpg",
-            "http://static.businessinsider.com/image/5213c32cecad045804000016/image.jpg",
-            "http://i2.cdn.turner.com/money/dam/assets/130416164248-marissa-mayer-620xa.png",
-            "http://wpuploads.appadvice.com/wp-content/uploads/2013/05/marissa-mayer-yahoo-new-c-008.jpg",
-            "https://pbs.twimg.com/profile_images/323982494/marissa_new4.jpg",
-            "http://media.idownloadblog.com/wp-content/uploads/2015/01/Marissa-Mayer-Yahoo-001.jpg",
-            "http://women2.com/wp-content/uploads/2012/07/121128_marissa_mayer.jpg"
+        final String[] fallbackSelfies = {
+                "http://aib.edu.au/blog/wp-content/uploads/2014/05/222977-marissa-mayer.jpg",
+                "http://i.huffpost.com/gen/882663/images/o-MARISSA-MAYER-facebook.jpg",
+                "http://i2.cdn.turner.com/money/dam/assets/130416164248-marissa-mayer-620xa.png",
+                "http://wpuploads.appadvice.com/wp-content/uploads/2013/05/marissa-mayer-yahoo-new-c-008.jpg",
+                "https://pbs.twimg.com/profile_images/323982494/marissa_new4.jpg",
+                "http://media.idownloadblog.com/wp-content/uploads/2015/01/Marissa-Mayer-Yahoo-001.jpg",
+                "https://s-media-cache-ak0.pinimg.com/originals/39/87/26/398726bb39ec252e0291c2b4e9e5dd7b.jpg"
         };
-        
+
+        String[] selfies;
+        try {
+            selfies = BingSearch.imageSearch("marissa mayer").toArray(new String[0]);
+        } catch (Exception e) {
+            selfies = fallbackSelfies;
+        }
+
         int selfieNo = new Random().nextInt(selfies.length);
-                
-        response.send(selfies[selfieNo]);                
+
+        response.send(selfies[selfieNo]);
     }
     
     public static void ping(Context context, String trigger, Response response)
