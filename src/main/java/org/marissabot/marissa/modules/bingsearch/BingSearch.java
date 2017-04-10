@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class BingSearch {
 
     private static final String appid;
+    private static final String MAX_RESULTS = "20";
 
     static {
         appid = Persist.load("bingsearch", "appid");
@@ -45,7 +46,7 @@ public class BingSearch {
                     .setPath("/bing/v5.0/search")
                     .addParameter("q", query)
                     .addParameter("mkt", "en-GB")
-                    .addParameter("count", "5")
+                    .addParameter("count", MAX_RESULTS)
                     .build();
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Couldn't build URI for search", e);
@@ -83,7 +84,7 @@ public class BingSearch {
                     .setPath("/bing/v5.0/images/search")
                     .addParameter("q", query)
                     .addParameter("mkt", "en-GB")
-                    .addParameter("count", "5")
+                    .addParameter("count", MAX_RESULTS)
                     .build();
         } catch (URISyntaxException e) {
             throw new IllegalStateException("couldn't build image search URI", e);
@@ -105,7 +106,7 @@ public class BingSearch {
                     .addParameter("q", query)
                     .addParameter("mkt", "en-GB")
                     .addParameter("imageType", "animatedGif")
-                    .addParameter("count", "5")
+                    .addParameter("count", MAX_RESULTS)
                     .build();
         } catch (URISyntaxException e) {
             throw new IllegalStateException("couldn't build animated search URI", e);
