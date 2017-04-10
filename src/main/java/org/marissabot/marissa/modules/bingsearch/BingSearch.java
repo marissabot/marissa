@@ -1,13 +1,9 @@
 package org.marissabot.marissa.modules.bingsearch;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.codehaus.jackson.JsonNode;
@@ -16,106 +12,148 @@ import org.marissabot.marissa.lib.Persist;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class BingSearch {
 
     private static final String appid;
-    private static final String host = "http://api.datamarket.azure.com/Bing/Search/";
 
     static {
         appid = Persist.load("bingsearch", "appid");
     }
 
-    private BingSearch() {}
+    private BingSearch() {
+    }
 
     public static List<String> search(String query) throws IOException {
-        if (query==null||query.isEmpty())
+        if (query == null || query.isEmpty())
             throw new IllegalArgumentException("cannot search for nothing");
 
-        String jsonResults = fetch(query, "Web");
+        URI uri;
+
+        try {
+            uri = new URIBuilder()
+                    .setScheme("https")
+                    .setHost("api.cognitive.microsoft.com")
+                    .setPath("/bing/v5.0/search")
+                    .addParameter("q", query)
+                    .addParameter("mkt", "en-GB")
+                    .addParameter("count", "5")
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("Couldn't build URI for search", e);
+        }
+
+        LoggerFactory.getLogger(BingSearch.class).info("[GET] " + uri.toString());
+
+        HttpGet get = new HttpGet(uri);
+
+        get.addHeader("Ocp-Apim-Subscription-Key", appid);
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        CloseableHttpResponse r = httpClient.execute(get);
+        String searchResults = IOUtils.toString(r.getEntity().getContent());
 
         ObjectMapper o = new ObjectMapper();
-        JsonNode n = o.readTree(jsonResults);
-        List<String> res = n.get("d").get("results").findValuesAsText("Url");
+        JsonNode n = o.readTree(searchResults);
+
+        List<String> res = n.get("webPages").get("value").findValuesAsText("url");
+
         LoggerFactory.getLogger(BingSearch.class).info(String.join("\n", res));
 
-        return res;
+        return mapRedirects(res);
     }
 
     public static List<String> imageSearch(String query) throws IOException {
-        if (query==null||query.isEmpty())
-            throw new IllegalArgumentException("cannot image search for nothing");
+        if (query == null || query.isEmpty())
+            throw new IllegalArgumentException("cannot image search with nothing");
 
-        String jsonResults = fetch(query, "Image");
+        URI uri;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("https")
+                    .setHost("api.cognitive.microsoft.com")
+                    .setPath("/bing/v5.0/images/search")
+                    .addParameter("q", query)
+                    .addParameter("mkt", "en-GB")
+                    .addParameter("count", "5")
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("couldn't build image search URI", e);
+        }
 
-        ObjectMapper o = new ObjectMapper();
-        JsonNode n = o.readTree(jsonResults);
-        List<String> res = n.get("d").get("results").findValuesAsText("MediaUrl");
-        LoggerFactory.getLogger(BingSearch.class).info(String.join("\n", res));
-
-        return res;
+        return mapRedirects(fetch(uri));
     }
 
     public static List<String> animatedSearch(String query) throws IOException {
-        if (query==null||query.isEmpty())
-            throw new IllegalArgumentException("cannot animated search for nothing");
+        if (query == null || query.isEmpty())
+            throw new IllegalArgumentException("cannot animated search with nothing");
 
-        String jsonResults = fetch(query + " .gif", "Image");
-        ObjectMapper o = new ObjectMapper();
-        JsonNode n = o.readTree(jsonResults);
-        JsonNode results = n.get("d").get("results");
-
-        List<String> res = new ArrayList<>();
-        for (JsonNode result : results) {
-            if ("image/animatedgif".equals(result.findValue("ContentType").asText()))
-            {
-                res.add( result.findValue("MediaUrl").asText() );
-            }
+        URI uri;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("https")
+                    .setHost("api.cognitive.microsoft.com")
+                    .setPath("/bing/v5.0/images/search")
+                    .addParameter("q", query)
+                    .addParameter("mkt", "en-GB")
+                    .addParameter("imageType", "animatedGif")
+                    .addParameter("count", "5")
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("couldn't build animated search URI", e);
         }
 
+        return mapRedirects(fetch(uri));
+    }
+
+    private static List<String> fetch(URI uri) throws IOException {
+        LoggerFactory.getLogger(BingSearch.class).info("[GET] " + uri.toString());
+
+        HttpGet get = new HttpGet(uri);
+
+        get.addHeader("Ocp-Apim-Subscription-Key", appid);
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        CloseableHttpResponse r = httpClient.execute(get);
+        String searchResults = IOUtils.toString(r.getEntity().getContent());
+
+        ObjectMapper o = new ObjectMapper();
+        JsonNode n = o.readTree(searchResults);
+
+        List<String> res = n.get("value").findValuesAsText("contentUrl");
+
         LoggerFactory.getLogger(BingSearch.class).info(String.join("\n", res));
+
         return res;
     }
 
-    private static String fetch(String query, String source) throws IOException {
-
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("", appid));
-
-        CloseableHttpClient httpClient = HttpClientBuilder.create()
-                                                          .setDefaultCredentialsProvider(credentialsProvider)
-                                                          .build();
-
-        URIBuilder uriBuilder;
-
-        try {
-            uriBuilder = new URIBuilder(host + source);
-            uriBuilder.addParameter("Query", "'"+query+"'");
-            uriBuilder.addParameter("$format", "json");
-         } catch (URISyntaxException e) {
-            throw new IllegalStateException("cannot generate search url", e);
-        }
-
-        HttpGet g;
-        try {
-            g = new HttpGet(uriBuilder.build());
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("cannot build request for query");
-        }
-
-        LoggerFactory.getLogger(BingSearch.class).info("[GET] " + g.getURI());
-
-        CloseableHttpResponse r = httpClient.execute(g);
-        String searchResults = IOUtils.toString(r.getEntity().getContent());
-
-        LoggerFactory.getLogger(BingSearch.class).info("Content:\n" + searchResults);
-
-        httpClient.close();
-
-        return searchResults;
+    private static List<String> mapRedirects(List<String> uris) {
+        return uris.parallelStream()
+                .map((url) -> {
+                    try {
+                        URLConnection con = new URL(url).openConnection();
+                        con.setReadTimeout(700); // give up early
+                        LoggerFactory.getLogger(BingSearch.class).info("Following redirects for '" + url + "'");
+                        con.connect();
+                        InputStream is = con.getInputStream();
+                        LoggerFactory.getLogger(BingSearch.class).info("Redirected URL is '" + con.getURL() + "'");
+                        is.close();
+                        return Optional.of(con.getURL().toString());
+                    } catch (Exception e) {
+                        return Optional.empty();
+                    }
+                })
+                .filter(Optional::isPresent)
+                .map(url -> (String) url.get()) // oh java
+                .collect(Collectors.toList());
     }
 
 }
