@@ -1,8 +1,13 @@
 package org.marissabot.marissa.modules;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Random;
+import java.util.TimeZone;
+
 import org.marissabot.libmarissa.Response;
 import org.marissabot.libmarissa.model.Context;
 import org.slf4j.LoggerFactory;
@@ -14,7 +19,11 @@ public class MiscUtils {
     
     public static void tellTheTime(Context context, String trigger, Response response)
     {
-        response.send(LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEE dd MMM yyyy -- HH:mm.ss")));
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+        response.send(nowAsISO); // utc iso860 - don't be a heathen
     }
     
     public static void selfie(Context context, String trigger, Response response)
