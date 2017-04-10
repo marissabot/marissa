@@ -5,12 +5,9 @@ import co.paralleluniverse.fibers.SuspendExecution;
 import java.util.Arrays;
 import org.marissabot.libmarissa.*;
 import org.marissabot.marissa.lib.Persist;
-import org.marissabot.marissa.modules.Animate;
-import org.marissabot.marissa.modules.Search;
+import org.marissabot.marissa.modules.*;
 import org.marissabot.marissa.modules.define.Define;
 import org.marissabot.marissa.modules.scripting.ScriptEngine;
-import org.marissabot.marissa.modules.MiscUtils;
-import org.marissabot.marissa.modules.Score;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.xmpp.core.XmppException;
@@ -37,6 +34,7 @@ public class Main {
 
         router.on("(search|image)\\s+.*", Search::search);
         router.on("animate\\s+.*", Animate::search);
+        router.on("giphy\\s+.*", GiphySearch::search);
 
         router.on("[-+]\\d+", Score::scoreChange);
         router.on("score", Score::scores);
@@ -50,7 +48,7 @@ public class Main {
             username,
             password,
             nickname,
-            Arrays.asList(new String[]{joinRoom})
+            Arrays.asList(joinRoom)
         );
 
         Runtime.getRuntime().addShutdownHook(

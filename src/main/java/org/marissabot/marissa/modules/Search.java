@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,7 +64,12 @@ public class Search {
             if (results.size() == 0) {
                 response.send("No results :(");
             } else {
-                response.send(results.get(0));
+                if (searchQuery.getType().equals(SearchQuery.Type.Image)) {
+                    int choice = new Random(System.nanoTime()).nextInt(results.size());
+                    response.send(results.get(choice));
+                } else {
+                    response.send(results.get(0));
+                }
             }
 
         } else {
