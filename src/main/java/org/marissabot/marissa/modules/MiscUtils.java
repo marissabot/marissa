@@ -46,7 +46,7 @@ public class MiscUtils {
             selfies = fallbackSelfies;
         }
 
-        int selfieNo = new Random().nextInt(selfies.length);
+        int selfieNo = new Random(System.nanoTime()).nextInt(selfies.length);
 
         response.send(selfies[selfieNo]);
     }
