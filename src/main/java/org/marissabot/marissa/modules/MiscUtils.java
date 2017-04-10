@@ -4,9 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Random;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.marissabot.libmarissa.Response;
 import org.marissabot.libmarissa.model.Context;
@@ -26,9 +24,23 @@ public class MiscUtils {
         String nowAsISO = df.format(new Date());
         response.send(nowAsISO); // utc iso860 - don't be a heathen
     }
-    
+
+    public static void selfieStrike(Context c, String trigger, Response response) {
+        List<String> selfies = fetchSelfies();
+        Collections.shuffle(selfies);
+        selfies.stream()
+                .limit(5)
+                .forEach(response::send);
+    }
+
     public static void selfie(Context context, String trigger, Response response)
     {
+        List<String> selfies = fetchSelfies();
+        int selfieNo = new Random(System.nanoTime()).nextInt(selfies.size());
+        response.send(selfies.get(selfieNo));
+    }
+
+    private static List<String> fetchSelfies() {
         final String[] fallbackSelfies = {
                 "http://aib.edu.au/blog/wp-content/uploads/2014/05/222977-marissa-mayer.jpg",
                 "http://i.huffpost.com/gen/882663/images/o-MARISSA-MAYER-facebook.jpg",
@@ -39,16 +51,15 @@ public class MiscUtils {
                 "https://s-media-cache-ak0.pinimg.com/originals/39/87/26/398726bb39ec252e0291c2b4e9e5dd7b.jpg"
         };
 
-        String[] selfies;
+        List<String> selfies;
         try {
-            selfies = BingSearch.imageSearch("marissa mayer").toArray(new String[0]);
+            selfies = BingSearch.imageSearch("marissa mayer");
         } catch (Exception e) {
-            selfies = fallbackSelfies;
+            selfies = new ArrayList<>();
+            Collections.addAll(selfies, fallbackSelfies);
         }
 
-        int selfieNo = new Random(System.nanoTime()).nextInt(selfies.length);
-
-        response.send(selfies[selfieNo]);
+        return selfies;
     }
     
     public static void ping(Context context, String trigger, Response response)

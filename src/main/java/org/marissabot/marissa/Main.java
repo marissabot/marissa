@@ -21,20 +21,20 @@ public class Main {
         String nickname = Persist.load("core", "nickname");
         final String joinRoom = Persist.load("core", "joinroom");
 
-        Router router = new Router("(?i)@?"+nickname, true);
+        Router router = new Router("(?i)@?"+nickname, false);
 
-        router.on(".*time.*", MiscUtils::tellTheTime);
-        router.on("selfie", MiscUtils::selfie);
+        router.on("selfie\\s+strike", MiscUtils::selfieStrike);
+        router.on("selfie\\s*$", MiscUtils::selfie);
         router.on("ping", MiscUtils::ping);
         router.on("echo.*", MiscUtils::echo);
-
-        //router.on(".*", ScriptEngine::dispatchToAll);
 
         router.on("define\\s+.*", Define::defineWord);
 
         router.on("(search|image)\\s+.*", Search::search);
         router.on("animate\\s+.*", Animate::search);
         router.on("giphy\\s+.*", GiphySearch::search);
+
+        router.on(".*time.*", MiscUtils::tellTheTime);
 
         router.on("[-+]\\d+", Score::scoreChange);
         router.on("score", Score::scores);
